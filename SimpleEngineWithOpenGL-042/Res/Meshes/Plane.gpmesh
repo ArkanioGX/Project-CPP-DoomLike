@@ -11,7 +11,8 @@
 		"DoorB",
 		"KeyR",
 		"KeyB",
-		"BImpact"
+		"BImpact",
+		"Exit"
 	],
 	"specularPower":100.0,
 	"vertices":[

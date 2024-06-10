@@ -7,6 +7,7 @@ private:
 	float ttl = lifeTime;
 public:
 	BulletImpactActor();
+	~BulletImpactActor();
 
 	void updateActor(float dt)override;
 

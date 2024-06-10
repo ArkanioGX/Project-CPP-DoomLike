@@ -5,6 +5,7 @@ class DoorActor : public Actor
 {
 public:
 	DoorActor();
+	~DoorActor();
 	void Open(int kid = -1);
 	void setSize(float s);
 	void createDoors();

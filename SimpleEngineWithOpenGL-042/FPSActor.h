@@ -6,6 +6,7 @@ class FPSActor : public Actor
 {
 public:
 	FPSActor();
+	~FPSActor();
 	
 	void updateActor(float dt) override;
 	void actorInput(const struct InputState& inputState) override;

@@ -14,6 +14,11 @@ BulletImpactActor::BulletImpactActor():
 	
 }
 
+BulletImpactActor::~BulletImpactActor()
+{
+	Actor::~Actor();
+}
+
 void BulletImpactActor::updateActor(float dt)
 {
 	ttl -= dt;

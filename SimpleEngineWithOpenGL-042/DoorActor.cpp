@@ -7,6 +7,14 @@ DoorActor::DoorActor()
 	
 }
 
+DoorActor::~DoorActor()
+{
+	for (int i = 0; i < DoorWalls.size(); i++) {
+		DoorWalls[i]->setState(ActorState::Dead);
+	}
+	DoorWalls.clear();
+}
+
 void DoorActor::Open(int kid)
 {
 	if (isLocked) {

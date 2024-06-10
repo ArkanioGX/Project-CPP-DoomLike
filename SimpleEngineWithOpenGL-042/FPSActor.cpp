@@ -14,6 +14,7 @@
 #include "DoorPlaneActor.h"
 #include "BulletImpactActor.h"
 #include "PickableKeyActor.h"
+#include "GameOverScreen.h"
 
 FPSActor::FPSActor() : 
 	Actor(), 
@@ -36,6 +37,12 @@ FPSActor::FPSActor() :
 	AABB collision(Vector3(-25.0f, -25.0f, -87.5f), Vector3(25.0f, 25.0f, 87.5f));
 	boxComponent->setObjectBox(collision);
 	boxComponent->setShouldRotate(false);
+}
+
+FPSActor::~FPSActor()
+{
+	Actor::~Actor();
+	FPSModel->setState(ActorState::Dead);
 }
 
 void FPSActor::updateActor(float dt)
@@ -68,6 +75,11 @@ void FPSActor::updateActor(float dt)
 		{
 			k->Pick();
 		}
+	}
+
+	Log::info(std::to_string((Game::instance().endPos - getPosition()).length()));
+	if ((Game::instance().endPos- getPosition() ).length() < 200) {
+		new GameOverScreen();
 	}
 }
 
@@ -168,7 +180,7 @@ void FPSActor::shoot()
 		
 		//BA->setRotation
 		
-		//takeDamage(1);
+		takeDamage(1);
 	}
 
 
@@ -238,7 +250,7 @@ void FPSActor::takeDamage(int dmg)
 	HP -= dmg;
 	Game::instance().getHUD()->updateHP(HP);
 	if (HP <= 0) {
-		Game::instance().setState(GameState::Quit);
+		new GameOverScreen();
 	}
 }
 

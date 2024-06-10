@@ -61,6 +61,7 @@ void Game::load()
 	Assets::loadTexture(renderer, "Res\\Textures\\KeyB.png", "KeyB");
 	Assets::loadTexture(renderer, "Res\\Textures\\HPLogo.png", "HPLogo");
 	Assets::loadTexture(renderer, "Res\\Textures\\BallImpact.png", "BImpact");
+	Assets::loadTexture(renderer, "Res\\Textures\\ExitPlatform.png", "Exit");
 	Assets::loadTexture(renderer, "Res\\Textures\\RadarArrow.png", "RadarArrow");
 
 	Assets::loadMesh("Res\\Meshes\\Cube.gpmesh", "Mesh_Cube");
@@ -77,7 +78,6 @@ void Game::load()
 	Assets::loadLevel("Res\\Levels\\level1.json", "Level1");
 
 	Vector3 StartPos = Vector3(-500.f, -500.f, 0.f);
-	Vector3 EndPos = Vector3(-500.f, -500.f, 0.f);
 
 	Level& l1 = Assets::getLevel("Level1");
 	float size = 200.0f;
@@ -117,7 +117,7 @@ void Game::load()
 				StartPos = Vector3(x * size, y * size, 0);
 				break;
 			case 3:
-				EndPos = Vector3(x * size, y * size, 0);
+				endPos = Vector3(x * size, y * size, 0);
 				break;
 
 			case 4:
@@ -133,6 +133,9 @@ void Game::load()
 			PlaneActor* p = new PlaneActor();
 			p->setPosition(Vector3(x * size, y * size, -size/2));
 			p->setScale(2);
+			if (l1.getTileAt(x, y) == 3) {
+				p->getMesh()->setTextureIndex(9);
+			}
 
 			 p = new PlaneActor();
 			p->setPosition(Vector3(x * size, y * size, size / 2));
@@ -354,6 +357,102 @@ void Game::loop()
 		render();
 		timer.delayTime();
 	}
+}
+
+void Game::reload()
+{
+	for (int i = 0; i < actors.size(); i++) {
+		actors[i]->setState(Actor::ActorState::Dead);
+	}
+	actors.clear();
+	Vector3 StartPos = Vector3(-500.f, -500.f, 0.f);
+	Vector3 EndPos = Vector3(-500.f, -500.f, 0.f);
+	Level& l1 = Assets::getLevel("Level1");
+	float size = 200.0f;
+	int mapSize = l1.getMaxSize();
+	//Load Tiles
+	for (int x = 0; x < mapSize; x++) {
+		for (int y = 0; y < mapSize; y++) {
+			PlaneActor* pw;
+			Quaternion q;
+			DoorActor* da;
+			switch (l1.getTileAt(x, y)) {
+			case 1:
+				q = Quaternion(Vector3::unitX, Maths::piOver2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3(x * size, (y - 0.5) * size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3(x * size, (y + 0.5) * size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::piOver2));
+				pw = new PlaneActor();
+				pw->setPosition(Vector3((x - 0.5) * size, (y)*size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3((x + 0.5) * size, (y)*size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				break;
+			case 2:
+				StartPos = Vector3(x * size, y * size, 0);
+				break;
+			case 3:
+				EndPos = Vector3(x * size, y * size, 0);
+				break;
+
+			case 4:
+				da = new DoorActor();
+				da->setPosition(Vector3(x * size, y * size, 0));
+				da->setSize(size);
+				da->createDoors();
+				break;
+			default:
+				break;
+			}
+
+			PlaneActor* p = new PlaneActor();
+			p->setPosition(Vector3(x * size, y * size, -size / 2));
+			p->setScale(2);
+
+			p = new PlaneActor();
+			p->setPosition(Vector3(x * size, y * size, size / 2));
+			p->setScale(2);
+			//Quaternion q(Vector3::unitY, -Maths::piOver2);
+			//q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::pi + Maths::pi / 4.0f));
+			//ca->setRotation(q);
+		}
+	}
+	//Load keys
+	for (int i = 0; i < l1.getKeyList().size(); i++) {
+		KeyData kd = l1.getKeyList()[i];
+		PickableKeyActor* pka = new PickableKeyActor();
+		pka->setKeyID(kd.keyID);
+		pka->setPosition(Vector3(kd.pos.y * size, kd.pos.x * size, 0));
+		addKey(pka);
+	}
+	//Load doors
+	for (int i = 0; i < l1.getDoors().size(); i++) {
+		DoorData kd = l1.getDoors()[i];
+		DoorActor* dka = new DoorActor();
+
+		dka->setPosition(Vector3(kd.pos.y * size, kd.pos.x * size, 0));
+		dka->setSize(size);
+		dka->createDoors();
+		dka->LockedKey(kd.keyID);
+		addDoors(dka);
+	}
+
+	fps = new FPSActor();
+	fps->setPosition(StartPos);
+
 }
 
 void Game::unload()

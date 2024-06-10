@@ -41,6 +41,7 @@ public:
 	bool initialize();
 	void load();
 	void loop();
+	void reload();
 	void unload();
 	void close();
 
@@ -70,6 +71,8 @@ public:
 	vector<DoorActor*>& getDoors() { return doors; }
 
 	class FPSActor* getPlayer() { return fps; }
+
+	Vector3 endPos;
 
 private:
 	void processInput();
