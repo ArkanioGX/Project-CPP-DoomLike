@@ -75,8 +75,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\SDL\SDL2-2.0.12\include;$(ProjectDir)..\SDL\SDL2_image-2.0.5\include;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\include;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\include;$(ProjectDir)..\SDL\glew-2.1.0\include;$(ProjectDir)..\SDL\rapidjson\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\SDL\SDL2-2.0.12\lib\x64;$(ProjectDir)..\SDL\SDL2_image-2.0.5\lib\x64;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)..\SDL\glew-2.1.0\lib\Release\x64;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\SDL\SDL2-2.0.12\include;$(ProjectDir)..\SDL\SDL2_image-2.0.5\include;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\include;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\include;$(ProjectDir)..\SDL\glew-2.1.0\include;$(ProjectDir)..\SDL\rapidjson\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\SDL\SDL2-2.0.12\lib\x64;$(ProjectDir)..\SDL\SDL2_image-2.0.5\lib\x64;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)..\SDL\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -106,7 +106,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Res" "$(TargetDir)Res" /e /y /i /r</Command>
@@ -148,8 +148,6 @@
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="AnimSpriteComponent.cpp" />
-    <ClCompile Include="AudioComponent.cpp" />
-    <ClCompile Include="AudioSystem.cpp" />
     <ClCompile Include="BackgroundSpriteComponent.cpp" />
     <ClCompile Include="BallActor.cpp" />
     <ClCompile Include="BallMoveComponent.cpp" />
@@ -197,7 +195,6 @@
     <ClCompile Include="RendererOGL.cpp" />
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="SoundEvent.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="SphereActor.cpp" />
     <ClCompile Include="Spline.cpp" />
@@ -218,8 +215,6 @@
     <ClInclude Include="AABB.h" />
     <ClInclude Include="Actor.h" />
     <ClInclude Include="AnimSpriteComponent.h" />
-    <ClInclude Include="AudioComponent.h" />
-    <ClInclude Include="AudioSystem.h" />
     <ClInclude Include="BackgroundSpriteComponent.h" />
     <ClInclude Include="BallActor.h" />
     <ClInclude Include="BallMoveComponent.h" />
@@ -270,7 +265,6 @@
     <ClInclude Include="RendererOGL.h" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="SoundEvent.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="SphereActor.h" />
     <ClInclude Include="Spline.h" />

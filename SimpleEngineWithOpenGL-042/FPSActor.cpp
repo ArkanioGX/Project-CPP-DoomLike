@@ -1,6 +1,5 @@
 #include "FPSActor.h"
 #include "MoveComponent.h"
-#include "AudioComponent.h"
 #include "Game.h"
 #include "FPSCameraComponent.h"
 #include "MeshComponent.h"
@@ -26,11 +25,7 @@ FPSActor::FPSActor() :
 	boxComponent(nullptr)
 {
 	moveComponent = new MoveComponent(this);
-	audioComponent = new AudioComponent(this);
 	cameraComponent = new FPSCameraComponent(this);
-
-	footstep = audioComponent->playEvent("event:/Footstep");
-	footstep.setPaused(true);
 
 	FPSModel = new Actor();
 	FPSModel->setScale(0.75f);
@@ -50,15 +45,6 @@ void FPSActor::updateActor(float dt)
 	if (!Maths::nearZero(moveComponent->getForwardSpeed())) {
 		SwayPosition += dt*6;
 		
-	}
-
-	// Play the footstep if we're moving and haven't recently
-	lastFootstep -= dt;
-	if (!Maths::nearZero(moveComponent->getForwardSpeed()) && lastFootstep <= 0.0f)
-	{
-		footstep.setPaused(false);
-		footstep.restart();
-		lastFootstep = 0.5f;
 	}
 
 	// Update rotation of model relatively to position
@@ -185,17 +171,7 @@ void FPSActor::shoot()
 		//takeDamage(1);
 	}
 
-	
-	// Play shooting sound
-	audioComponent->playEvent("event:/Shot");
-}
 
-void FPSActor::setFootstepSurface(float value)
-{
-	// Pause here because the way I setup the parameter in FMOD
-	// changing it will play a footstep
-	footstep.setPaused(true);
-	footstep.setParameter("Surface", value);
 }
 
 void FPSActor::setVisible(bool isVisible)

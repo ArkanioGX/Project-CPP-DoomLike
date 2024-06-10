@@ -7,7 +7,6 @@
 #include "CubeActor.h"
 #include "SphereActor.h"
 #include "PlaneActor.h"
-#include "AudioComponent.h"
 #include "FPSActor.h"
 #include "FollowActor.h"
 #include "OrbitActor.h"
@@ -21,11 +20,10 @@ bool Game::initialize()
 {
 	bool isWindowInit = window.initialize();
 	bool isRendererInit = renderer.initialize(window);
-	bool isAudioInit = audioSystem.initialize();
 	bool isInputInit = inputSystem.initialize();
 	bool isFontInit = Font::initialize();
 
-	return isWindowInit && isRendererInit && isAudioInit && isInputInit && isFontInit; // Return bool && bool && bool ...to detect error
+	return isWindowInit && isRendererInit && isInputInit && isFontInit; // Return bool && bool && bool ...to detect error
 }
 
 void Game::load()
@@ -225,9 +223,6 @@ void Game::load()
 	crosshair = new SpriteComponent(crosshairActor, Assets::getTexture("Crosshair"));
 	*/
 
-	// Start music
-	musicEvent = audioSystem.playEvent("event:/Music");
-
 	/*
 	TargetActor* t = new TargetActor();
 	t->setPosition(Vector3(1450.0f, 0.0f, 100.0f));
@@ -282,8 +277,6 @@ void Game::processInput()
 
 void Game::update(float dt)
 {
-	// Update audio
-	audioSystem.update(dt);
 
 	if (state == GameState::Gameplay)
 	{
@@ -381,7 +374,6 @@ void Game::close()
 	Font::close();
 	inputSystem.close();
 	renderer.close();
-	audioSystem.close();
 	window.close();
 	SDL_Quit();
 }

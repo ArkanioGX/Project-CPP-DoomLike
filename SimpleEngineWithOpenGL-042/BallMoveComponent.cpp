@@ -36,12 +36,6 @@ void BallMoveComponent::update(float dt)
 		// If we collided, reflect the ball about the normal
 		dir = Vector3::reflect(dir, info.normal);
 		owner.rotateToNewForward(dir);
-		// Did we hit a target?
-		TargetActor* target = dynamic_cast<TargetActor*>(info.actor);
-		if (target)
-		{
-			static_cast<BallActor*>(&owner)->hitTarget();
-		}
 	}
 
 	// Base class update moves based on forward speed

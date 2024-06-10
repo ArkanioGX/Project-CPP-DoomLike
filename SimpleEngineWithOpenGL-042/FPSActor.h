@@ -1,6 +1,5 @@
 #pragma once
 #include "Actor.h"
-#include "SoundEvent.h"
 #include "Vector3.h"
 
 class FPSActor : public Actor
@@ -12,7 +11,6 @@ public:
 	void actorInput(const struct InputState& inputState) override;
 	void shoot();
 
-	void setFootstepSurface(float value);
 	void setVisible(bool isVisible);
 	void fixCollisions();
 
@@ -27,7 +25,6 @@ private:
 	class MeshComponent* meshComponent;
 	class FPSCameraComponent* cameraComponent;
 	class Actor* FPSModel;
-	SoundEvent footstep;
 	float lastFootstep;
 	class BoxComponent* boxComponent;
 	float SwayPosition = 0;

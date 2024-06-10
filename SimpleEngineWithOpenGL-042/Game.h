@@ -5,7 +5,6 @@
 #include "Window.h"
 #include "Vector2.h"
 #include "RendererOGL.h"
-#include "AudioSystem.h"
 #include "InputSystem.h"
 #include "PhysicsSystem.h"
 #include "PlaneActor.h"
@@ -51,7 +50,6 @@ public:
 	void addActor(Actor* actor);
 	void removeActor(Actor* actor);
 	RendererOGL& getRenderer() { return renderer; }
-	AudioSystem& getAudioSystem() { return audioSystem; }
 	PhysicsSystem& getPhysicsSystem() { return physicsSystem; }
 	InputSystem& getInputSystem() { return inputSystem; }
 	const vector<class UIScreen*>& getUIStack() { return UIStack; }
@@ -81,7 +79,6 @@ private:
 	GameState state;
 	Window window;
 	RendererOGL renderer;
-	AudioSystem audioSystem;
 	InputSystem inputSystem;
 	PhysicsSystem physicsSystem;
 	vector<class UIScreen*> UIStack;
@@ -92,7 +89,6 @@ private:
 	vector<Actor*> pendingActors;
 
 	// Game specific
-	SoundEvent musicEvent;
 	class FPSActor* fps;
 	class SpriteComponent* crosshair;
 	vector<PlaneActor*> planes;

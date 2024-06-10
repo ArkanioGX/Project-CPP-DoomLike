@@ -67,15 +67,6 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Assets.cpp" />
-    <ClCompile Include="AudioComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioSystem.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundEvent.cpp">
-      <Filter>Systems</Filter>
-    </ClCompile>
     <ClCompile Include="ControllerState.cpp">
       <Filter>Systems\Input</Filter>
     </ClCompile>
@@ -258,15 +249,6 @@
     <ClInclude Include="Assets.h" />
     <ClInclude Include="DirectionalLight.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioSystem.h">
-      <Filter>Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundEvent.h">
-      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="ControllerState.h">
       <Filter>Systems\Input</Filter>
