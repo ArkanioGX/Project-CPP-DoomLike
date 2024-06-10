@@ -9,8 +9,9 @@
 std::map<string, Texture> Assets::textures;
 std::map<string, Shader> Assets::shaders;
 std::map<string, Mesh> Assets::meshes;
-std::map<string, Font> Assets::fonts;
 std::map<string, string> Assets::texts;
+std::map<string, Font> Assets::fonts;
+std::map<string, Level> Assets::levels;
 
 Texture Assets::loadTexture(IRenderer& renderer, const string& filename, const string& name)
 {
@@ -27,6 +28,23 @@ Texture& Assets::getTexture(const string& name)
         Log::error(LogCategory::Application, loadError.str());
     }
     return textures[name];
+}
+
+Level Assets::loadLevel(const string& filename, const string& name)
+{
+    levels[name] = loadLevelFromFile(filename.c_str());
+    return levels[name];
+}
+
+Level& Assets::getLevel(const std::string& name)
+{
+    if (levels.find(name) == end(levels))
+    {
+        std::ostringstream loadError;
+        loadError << "Level " << name << " does not exist in assets manager.";
+        Log::error(LogCategory::Application, loadError.str());
+    }
+    return levels[name];
 }
 
 Shader Assets::loadShader(const std::string& vShaderFile, const std::string& fShaderFile, const std::string& tcShaderFile, const std::string& teShaderFile, const std::string& gShaderFile, const std::string& name)
@@ -392,4 +410,105 @@ Font Assets::loadFontFromFile(const string& filename)
     }
     Log::info("Loaded font " + filename);
     return font;
+}
+
+Level Assets::loadLevelFromFile(const string& filename)
+{
+    Level lvl;
+
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        Log::error(LogCategory::Application, "File not found: Level " + filename);
+    }
+
+    std::stringstream fileStream;
+    fileStream << file.rdbuf();
+    std::string contents = fileStream.str();
+    rapidjson::StringStream jsonStr(contents.c_str());
+    rapidjson::Document doc;
+    doc.ParseStream(jsonStr);
+
+    if (!doc.IsObject())
+    {
+        std::ostringstream s;
+        s << "Level " << filename << " is not valid json";
+        Log::error(LogCategory::Application, s.str());
+    }
+
+    // Load in the tile
+    const rapidjson::Value& indJson = doc["content"];
+    if (!indJson.IsArray() || indJson.Size() < 1)
+    {
+        std::ostringstream s;
+        s << "Level " << filename << " has no content";
+        Log::error(LogCategory::Application, s.str());
+    }
+
+    std::vector<std::vector<int> > lcontent(indJson.Size(),std::vector<int>(indJson[0].Size(), 0));
+    //lcontent.reserve(indJson.Size() * indJson[0].Size());
+    for (rapidjson::SizeType i = 0; i < indJson.Size(); i++)
+    {
+        const rapidjson::Value& ind = indJson[i];
+        if (!ind.IsArray())
+        {
+            std::ostringstream s;
+            s << "Invalid content for " << filename;
+            Log::error(LogCategory::Application, s.str());
+        }
+        for (rapidjson::SizeType j = 0; j < indJson[i].Size(); j++) {
+            
+            lcontent[i][j] = indJson[i][j].GetUint();
+        }
+    }
+
+    const rapidjson::Value& kJson = doc["KeyList"];
+    if (!kJson.IsArray() || kJson.Size() < 1)
+    {
+        std::ostringstream s;
+        s << "Level " << filename << " has no key list";
+        Log::error(LogCategory::Application, s.str());
+    }
+
+    //lcontent.reserve(indJson.Size() * indJson[0].Size());
+    for (rapidjson::SizeType i = 0; i < kJson.Size(); i++)
+    {
+        const rapidjson::Value& ind = kJson[i];
+        if (!ind.IsObject())
+        {
+            std::ostringstream s;
+            s << "Invalid content for " << filename;
+            Log::error(LogCategory::Application, s.str());
+        }
+        KeyData currentK{ Vector2(ind["pos"][0].GetUint(), ind["pos"][1].GetUint()), ind["keyID"].GetUint() };
+        lvl.addKey(currentK);
+    }
+
+    const rapidjson::Value& dJson = doc["DoorList"];
+    if (!dJson.IsArray() || dJson.Size() < 1)
+    {
+        std::ostringstream s;
+        s << "Level " << filename << " has no door list";
+        Log::error(LogCategory::Application, s.str());
+    }
+
+    //lcontent.reserve(indJson.Size() * indJson[0].Size());
+    for (rapidjson::SizeType i = 0; i < dJson.Size(); i++)
+    {
+        const rapidjson::Value& ind = dJson[i];
+        if (!ind.IsObject())
+        {
+            std::ostringstream s;
+            s << "Invalid content for " << filename;
+            Log::error(LogCategory::Application, s.str());
+        }
+        DoorData currentD{ Vector2(ind["pos"][0].GetUint(), ind["pos"][1].GetUint()), ind["keyID"].GetUint() };
+        lvl.addDoor(currentD);
+    }
+
+    lvl.setTiles(lcontent);
+
+    Log::info("Loaded level " + filename);
+
+    return lvl;
 }

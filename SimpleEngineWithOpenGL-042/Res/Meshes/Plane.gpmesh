@@ -2,8 +2,16 @@
 	"version":1,
 	"vertexformat":"PosNormTex",
 	"shader":"Phong",
-	"textures":[
-		"Plane"
+	"textures": [
+		"Plane",
+		"Ground",
+		"Wall",
+		"Door",
+		"DoorR",
+		"DoorB",
+		"KeyR",
+		"KeyB",
+		"BImpact"
 	],
 	"specularPower":100.0,
 	"vertices":[

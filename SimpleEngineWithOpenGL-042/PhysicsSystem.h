@@ -21,13 +21,14 @@ public:
 		class Actor* actor;
 	};
 
+	static vector<Actor*> DEFAULT_IGNORE;
 
 public:
 	PhysicsSystem();
 
 	void addBox(class BoxComponent* box);
 	void removeBox(class BoxComponent* box);
-	bool segmentCast(const LineSegment& l, CollisionInfo& outColl);
+	bool segmentCast(const LineSegment& l, CollisionInfo& outColl, std::vector<Actor*>& ActorsToIgnore = DEFAULT_IGNORE);
 
 	// Tests collisions using naive pairwise
 	void testPairwise(std::function<void(class Actor*, class Actor*)> f);

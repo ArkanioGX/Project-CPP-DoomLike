@@ -8,13 +8,18 @@ HUD::HUD():
 	UIScreen(),
 	isTargetingEnemy(false),
 	radarRange(2000.0f),
-	radarRadius(92.0f)
+	radarRadius(92.0f),
+	font(Assets::getFont("Carlito"))
 {
 	crosshair = &Assets::getTexture("Crosshair");
 	crosshairEnemy = &Assets::getTexture("CrosshairRed");
 	radar = &Assets::getTexture("Radar");
 	blipTex = &Assets::getTexture("Blip");
 	radarArrow = &Assets::getTexture("RadarArrow");
+	font = Assets::getFont("Carlito");
+	HPCount = font.renderText("10",Color::green,30);
+	HPLogo = &Assets::getTexture("HPLogo");
+	HPBG = &Assets::getTexture("DialogBG");
 }
 
 HUD::~HUD()
@@ -40,6 +45,9 @@ void HUD::draw(Shader& shader)
 		drawTexture(shader, blipTex, radarPosition + blip, 1.0f);
 	}
 	drawTexture(shader, radarArrow, radarPosition);
+	drawTexture(shader, HPBG, Vector2(radarPosition.x - 150, -radarPosition.y - 110));
+	drawTexture(shader, HPCount, Vector2(radarPosition.x, -radarPosition.y-30));
+	drawTexture(shader, HPLogo, Vector2(radarPosition.x-60, -radarPosition.y-30));
 }
 
 void HUD::addTargetComponent(TargetComponent* tc)
@@ -117,4 +125,13 @@ void HUD::updateRadar(float dt)
 		}
 	}
 	
+}
+
+void HUD::updateHP(int hp)
+{
+	Vector3 ColorUsed = Color::green;
+	if (hp <= 0) {
+		ColorUsed = Color::red;
+	}
+	HPCount = font.renderText(std::to_string(hp),ColorUsed, 30);
 }

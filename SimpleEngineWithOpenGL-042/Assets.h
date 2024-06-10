@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "Font.h"
+#include "Level.h"
 using std::map;
 using std::string;
 
@@ -18,6 +19,7 @@ public:
     static std::map<string, Texture> textures;
     static std::map<string, Shader> shaders;
     static std::map<string, Mesh> meshes;
+    static std::map<string, Level> levels;
     static std::map<string, Font> fonts;
     static std::map<string, string> texts;
 
@@ -26,6 +28,12 @@ public:
 
     // Retrieves a stored texture
     static Texture& getTexture(const std::string& name);
+
+    // Loads a texture from file
+    static Level loadLevel(const string& filename, const string& name);
+
+    // Retrieves a stored texture
+    static Level& getLevel(const std::string& name);
 
     // Loads (and generates) a shader program from file loading vertex, fragment (and tessellation control, evaluation,
     // geometry) shader's source code. If tcShaderFile, teShaderFile, gShaderFile are not nullptr, it also loads
@@ -72,5 +80,7 @@ private:
     static Mesh loadMeshFromFile(const string& filename);
 
     static Font loadFontFromFile(const string& filename);
+
+    static Level loadLevelFromFile(const string& filename);
 };
 

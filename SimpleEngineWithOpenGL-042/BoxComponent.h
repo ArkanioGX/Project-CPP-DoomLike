@@ -14,10 +14,14 @@ public:
 
 	void onUpdateWorldTransform() override;
 
+	void setCanPassThrough(bool b) { canPassThrough = b; }
+	bool getCanPassThrough() { return canPassThrough; }
+
 
 private:
 	AABB objectBox;
 	AABB worldBox;
 	bool shouldRotate;
+	bool canPassThrough = false;
 };
 

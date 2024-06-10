@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Timer.h"
 #include "Assets.h"
+#include <algorithm>
 #include "MeshComponent.h"
 #include "CubeActor.h"
 #include "SphereActor.h"
@@ -13,6 +14,8 @@
 #include "SplineActor.h"
 #include "TargetActor.h"
 #include "PauseScreen.h"
+#include "DoorActor.h"
+#include "PickableKeyActor.h"
 
 bool Game::initialize()
 {
@@ -37,6 +40,8 @@ void Game::load()
 	Assets::loadTexture(renderer, "Res\\Textures\\Cube.png", "Cube");
 	Assets::loadTexture(renderer, "Res\\Textures\\HealthBar.png", "HealthBar");
 	Assets::loadTexture(renderer, "Res\\Textures\\Plane.png", "Plane");
+	Assets::loadTexture(renderer, "Res\\Textures\\GroundBrick.png", "Ground");
+	Assets::loadTexture(renderer, "Res\\Textures\\WallBrick.png", "Wall");
 	Assets::loadTexture(renderer, "Res\\Textures\\Radar.png", "Radar");
 	Assets::loadTexture(renderer, "Res\\Textures\\Sphere.png", "Sphere");
 	Assets::loadTexture(renderer, "Res\\Textures\\Crosshair.png", "Crosshair");
@@ -51,6 +56,14 @@ void Game::load()
 	Assets::loadTexture(renderer, "Res\\Textures\\Radar.png", "Radar");
 	Assets::loadTexture(renderer, "Res\\Textures\\Blip.png", "Blip");
 	Assets::loadTexture(renderer, "Res\\Textures\\RadarArrow.png", "RadarArrow");
+	Assets::loadTexture(renderer, "Res\\Textures\\Door.png", "Door");
+	Assets::loadTexture(renderer, "Res\\Textures\\DoorLockedR.png", "DoorR");
+	Assets::loadTexture(renderer, "Res\\Textures\\DoorLockedB.png", "DoorB");
+	Assets::loadTexture(renderer, "Res\\Textures\\KeyR.png", "KeyR");
+	Assets::loadTexture(renderer, "Res\\Textures\\KeyB.png", "KeyB");
+	Assets::loadTexture(renderer, "Res\\Textures\\HPLogo.png", "HPLogo");
+	Assets::loadTexture(renderer, "Res\\Textures\\BallImpact.png", "BImpact");
+	Assets::loadTexture(renderer, "Res\\Textures\\RadarArrow.png", "RadarArrow");
 
 	Assets::loadMesh("Res\\Meshes\\Cube.gpmesh", "Mesh_Cube");
 	Assets::loadMesh("Res\\Meshes\\Plane.gpmesh", "Mesh_Plane");
@@ -58,24 +71,105 @@ void Game::load()
 	Assets::loadMesh("Res\\Meshes\\Rifle.gpmesh", "Mesh_Rifle");
 	Assets::loadMesh("Res\\Meshes\\RacingCar.gpmesh", "Mesh_RacingCar");
 	Assets::loadMesh("Res\\Meshes\\Target.gpmesh", "Mesh_Target");
+	Assets::loadMesh("Res\\Meshes\\BulletImpact.gpmesh", "Mesh_BImpact");
 
 	Assets::loadFont("Res\\Fonts\\Carlito-Regular.ttf", "Carlito");
 	Assets::loadText("Res\\Localization\\English.gptext");
 
+	Assets::loadLevel("Res\\Levels\\level1.json", "Level1");
+
+	Vector3 StartPos = Vector3(-500.f, -500.f, 0.f);
+	Vector3 EndPos = Vector3(-500.f, -500.f, 0.f);
+
+	Level& l1 = Assets::getLevel("Level1");
+	float size = 200.0f;
+	int mapSize =  l1.getMaxSize();
+	//Load Tiles
+	for (int x = 0; x < mapSize; x++) {
+		for (int y = 0; y < mapSize; y++) {
+			PlaneActor* pw;
+			Quaternion q;
+			DoorActor* da;
+			switch (l1.getTileAt(x, y)) {
+			case 1:
+				q = Quaternion(Vector3::unitX, Maths::piOver2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3(x * size, (y - 0.5) * size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3(x * size, (y + 0.5) * size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::piOver2));
+				pw = new PlaneActor();
+				pw->setPosition(Vector3((x - 0.5) * size, (y)*size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				pw = new PlaneActor();
+				pw->setPosition(Vector3((x + 0.5) * size, (y)*size, 0));
+				pw->setScale(2);
+				pw->setRotation(q);
+				pw->getMesh()->setTextureIndex(2);
+				break;
+			case 2:
+				StartPos = Vector3(x * size, y * size, 0);
+				break;
+			case 3:
+				EndPos = Vector3(x * size, y * size, 0);
+				break;
+
+			case 4:
+				da = new DoorActor();
+				da->setPosition(Vector3(x * size, y * size, 0));
+				da->setSize(size);
+				da->createDoors();
+				break;
+			default:
+				break;
+			}
+
+			PlaneActor* p = new PlaneActor();
+			p->setPosition(Vector3(x * size, y * size, -size/2));
+			p->setScale(2);
+
+			 p = new PlaneActor();
+			p->setPosition(Vector3(x * size, y * size, size / 2));
+			p->setScale(2);
+			//Quaternion q(Vector3::unitY, -Maths::piOver2);
+			//q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::pi + Maths::pi / 4.0f));
+			//ca->setRotation(q);
+		}
+	}
+	//Load keys
+	for (int i = 0; i < l1.getKeyList().size(); i++) {
+		KeyData kd = l1.getKeyList()[i];
+		PickableKeyActor* pka = new PickableKeyActor();
+		pka->setKeyID(kd.keyID);
+		pka->setPosition(Vector3(kd.pos.y*size,kd.pos.x*size,0));
+		addKey(pka);
+	}
+	//Load doors
+	for (int i = 0; i < l1.getDoors().size(); i++) {
+		DoorData kd = l1.getDoors()[i];
+		DoorActor* dka = new DoorActor();
+		
+		dka->setPosition(Vector3(kd.pos.y * size, kd.pos.x * size, 0));
+		dka->setSize(size);
+		dka->createDoors();
+		dka->LockedKey(kd.keyID);
+		addDoors(dka);
+	}
 
 	fps = new FPSActor();
+	fps->setPosition(StartPos);
 
-	CubeActor* a = new CubeActor();
-	a->setPosition(Vector3(200.0f, 105.0f, 0.0f));
-	a->setScale(100.0f);
-	Quaternion q(Vector3::unitY, -Maths::piOver2);
-	q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::pi + Maths::pi / 4.0f));
-	a->setRotation(q);
+	
 
-	SphereActor* b = new SphereActor();
-	b->setPosition(Vector3(200.0f, -75.0f, 0.0f));
-	b->setScale(3.0f);
-
+	/*
 	// Floor and walls
 
 	// Setup floor
@@ -114,21 +208,14 @@ void Game::load()
 		p = new PlaneActor();
 		p->setPosition(Vector3(-start + size, start + i * size, 0.0f));
 		p->setRotation(q);
-	}
+	}*/
 
 	// Setup lights
-	renderer.setAmbientLight(Vector3(0.2f, 0.2f, 0.2f));
+	renderer.setAmbientLight(Vector3(0.4f, 0.4f, 0.4f));
 	DirectionalLight& dir = renderer.getDirectionalLight();
 	dir.direction = Vector3(0.0f, -0.707f, -0.707f);
 	dir.diffuseColor = Vector3(0.78f, 0.88f, 1.0f);
 	dir.specColor = Vector3(0.8f, 0.8f, 0.8f);
-
-	// Create spheres with audio components playing different sounds
-	SphereActor* soundSphere = new SphereActor();
-	soundSphere->setPosition(Vector3(500.0f, -75.0f, 0.0f));
-	soundSphere->setScale(1.0f);
-	AudioComponent* ac = new AudioComponent(soundSphere);
-	ac->playEvent("event:/FireLoop");
 
 	// HUD
 	hud = new HUD();
@@ -141,6 +228,7 @@ void Game::load()
 	// Start music
 	musicEvent = audioSystem.playEvent("event:/Music");
 
+	/*
 	TargetActor* t = new TargetActor();
 	t->setPosition(Vector3(1450.0f, 0.0f, 100.0f));
 	t = new TargetActor();
@@ -148,7 +236,7 @@ void Game::load()
 	t = new TargetActor();
 	t->setPosition(Vector3(1450.0f, -500.0f, 200.0f));
 	t = new TargetActor();
-	t->setPosition(Vector3(1450.0f, 500.0f, 200.0f));
+	t->setPosition(Vector3(1450.0f, 500.0f, 200.0f));*/
 }
 
 void Game::processInput()
@@ -347,4 +435,26 @@ void Game::removePlane(PlaneActor* plane)
 {
 	auto iter = std::find(begin(planes), end(planes), plane);
 	planes.erase(iter);
+}
+
+void Game::removeKey(PickableKeyActor* k)
+{
+	auto iter = std::find(begin(keys), end(keys), k);
+	keys.erase(iter);
+}
+
+void Game::addDoors(DoorActor* k)
+{
+	doors.emplace_back(k);
+}
+
+void Game::removeDoors(DoorActor* k)
+{
+	auto iter = std::find(begin(doors), end(doors), k);
+	doors.erase(iter);
+}
+
+void Game::addKey(PickableKeyActor* k)
+{
+	keys.emplace_back(k);
 }

@@ -10,6 +10,11 @@
 #include "BallActor.h"
 #include "BoxComponent.h"
 #include "Collisions.h"
+#include "Log.h"
+#include "SphereActor.h"
+#include "DoorPlaneActor.h"
+#include "BulletImpactActor.h"
+#include "PickableKeyActor.h"
 
 FPSActor::FPSActor() : 
 	Actor(), 
@@ -42,6 +47,11 @@ void FPSActor::updateActor(float dt)
 {
 	Actor::updateActor(dt);
 
+	if (!Maths::nearZero(moveComponent->getForwardSpeed())) {
+		SwayPosition += dt*6;
+		
+	}
+
 	// Play the footstep if we're moving and haven't recently
 	lastFootstep -= dt;
 	if (!Maths::nearZero(moveComponent->getForwardSpeed()) && lastFootstep <= 0.0f)
@@ -51,18 +61,31 @@ void FPSActor::updateActor(float dt)
 		lastFootstep = 0.5f;
 	}
 
-	// Update position and rotation of model relatively to position
+	// Update rotation of model relatively to position
 	Vector3 modelPosition = getPosition();
-	modelPosition += getForward() * MODEL_OFFSET.x;
-	modelPosition += getRight() * MODEL_OFFSET.y;
-	modelPosition.z += MODEL_OFFSET.z;
+	modelPosition += getForward()  * MODEL_OFFSET.x ;
+	modelPosition += (getRight() * (sinf(SwayPosition)*SwayMultiplier)) + (getRight() * MODEL_OFFSET.y);
+	modelPosition.z += MODEL_OFFSET.z - Maths::abs((sinf(SwayPosition) * SwayMultiplier)*SwayUpRatio);
 	FPSModel->setPosition(modelPosition);
 	Quaternion q = getRotation();
 	q = Quaternion::concatenate(q, Quaternion(getRight(), cameraComponent->getPitch()));
 	FPSModel->setRotation(q);
 
 	fixCollisions();
+
+	auto& keys = getGame().getKeys();
+	for (auto k : keys)
+	{
+		// Do we collide with this PlaneActor?
+		const AABB& kBox = k->getBox()->getWorldBox();
+		if (Collisions::intersect(boxComponent->getWorldBox(), kBox))
+		{
+			k->Pick();
+		}
+	}
 }
+
+
 
 void FPSActor::actorInput(const InputState& inputState)
 {
@@ -90,7 +113,7 @@ void FPSActor::actorInput(const InputState& inputState)
 	// Mouse mouvement
 	Vector2 mousePosition = inputState.mouse.getPosition();
 	float x = mousePosition.x;
-	float y = mousePosition.y;
+	float y = 0;
 	const int maxMouseSpeed = 500;
 	const float maxAngularSpeed = Maths::pi * 8;
 	float angularSpeed = 0.0f;
@@ -120,6 +143,7 @@ void FPSActor::shoot()
 {
 	// Get start point (in center of screen on near plane)
 	Vector3 screenPoint(0.0f, 0.0f, 0.0f);
+	
 	Vector3 start = getGame().getRenderer().unproject(screenPoint);
 	// Get end point (in center of screen, between near and far)
 	screenPoint.z = 0.9f;
@@ -127,12 +151,41 @@ void FPSActor::shoot()
 	// Get direction vector
 	Vector3 dir = end - start;
 	dir.normalize();
-	// Spawn a ball
-	BallActor* ball = new BallActor();
-	ball->setPlayer(this);
-	ball->setPosition(start + dir * 20.0f);
-	// Rotate the ball to face new direction
-	ball->rotateToNewForward(dir);
+	
+	LineSegment l(getPosition(), getPosition() + dir*5000.f);
+
+	// Test segment vs world
+	PhysicsSystem::CollisionInfo info;
+
+	std::vector<Actor*> IgnoredActors;
+	IgnoredActors.push_back(this);
+
+	// (Don't collide vs player)
+	if (getGame().getPhysicsSystem().segmentCast(l, info,IgnoredActors))
+	{
+		DoorPlaneActor* dap = dynamic_cast<DoorPlaneActor*>(info.actor);
+		if (dap) {
+			dap->activate();
+		}
+		BulletImpactActor* BA = new BulletImpactActor();
+		
+		Vector3 dir = getPosition() - info.point ;
+		dir.normalize();
+
+		//SphereActor* SA = new SphereActor();
+		//SA->setPosition(info.point + dir * 5);
+
+		BA->setPosition(info.point + dir * 10);
+		Quaternion q = Quaternion(info.normal, Maths::piOver2);
+		q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::piOver2));
+		BA->setRotation(q);
+		
+		//BA->setRotation
+		
+		//takeDamage(1);
+	}
+
+	
 	// Play shooting sound
 	audioComponent->playEvent("event:/Shot");
 }
@@ -163,40 +216,53 @@ void FPSActor::fixCollisions()
 	{
 		// Do we collide with this PlaneActor?
 		const AABB& planeBox = pa->getBox()->getWorldBox();
-		if (Collisions::intersect(playerBox, planeBox))
+		if (Collisions::intersect(playerBox, planeBox) )
 		{
-			// Calculate all our differences
-			float dx1 = planeBox.max.x - playerBox.min.x;
-			float dx2 = planeBox.min.x - playerBox.max.x;
-			float dy1 = planeBox.max.y - playerBox.min.y;
-			float dy2 = planeBox.min.y - playerBox.max.y;
-			float dz1 = planeBox.max.z - playerBox.min.z;
-			float dz2 = planeBox.min.z - playerBox.max.z;
+			if (!pa->getBox()->getCanPassThrough()) {
+				// Calculate all our differences
+				float dx1 = planeBox.max.x - playerBox.min.x;
+				float dx2 = planeBox.min.x - playerBox.max.x;
+				float dy1 = planeBox.max.y - playerBox.min.y;
+				float dy2 = planeBox.min.y - playerBox.max.y;
+				float dz1 = planeBox.max.z - playerBox.min.z;
+				float dz2 = planeBox.min.z - playerBox.max.z;
 
-			// Set dx to whichever of dx1/dx2 have a lower abs
-			float dx = Maths::abs(dx1) < Maths::abs(dx2) ? dx1 : dx2;
-			// Ditto for dy
-			float dy = Maths::abs(dy1) < Maths::abs(dy2) ? dy1 : dy2;
-			// Ditto for dz
-			float dz = Maths::abs(dz1) < Maths::abs(dz2) ? dz1 : dz2;
+				// Set dx to whichever of dx1/dx2 have a lower abs
+				float dx = Maths::abs(dx1) < Maths::abs(dx2) ? dx1 : dx2;
+				// Ditto for dy
+				float dy = Maths::abs(dy1) < Maths::abs(dy2) ? dy1 : dy2;
+				// Ditto for dz
+				float dz = Maths::abs(dz1) < Maths::abs(dz2) ? dz1 : dz2;
 
-			// Whichever is closest, adjust x/y position
-			if (Maths::abs(dx) <= Maths::abs(dy) && Maths::abs(dx) <= Maths::abs(dz))
-			{
-				pos.x += dx;
-			}
-			else if (Maths::abs(dy) <= Maths::abs(dx) && Maths::abs(dy) <= Maths::abs(dz))
-			{
-				pos.y += dy;
-			}
-			else
-			{
-				pos.z += dz;
-			}
+				// Whichever is closest, adjust x/y position
+				if (Maths::abs(dx) <= Maths::abs(dy) && Maths::abs(dx) <= Maths::abs(dz))
+				{
+					pos.x += dx;
+				}
+				else if (Maths::abs(dy) <= Maths::abs(dx) && Maths::abs(dy) <= Maths::abs(dz))
+				{
+					pos.y += dy;
+				}
+				else
+				{
+					pos.z += dz;
+				}
 
-			// Need to set position and update box component
-			setPosition(pos);
-			boxComponent->onUpdateWorldTransform();
+				// Need to set position and update box component
+				setPosition(pos);
+				boxComponent->onUpdateWorldTransform();
+			}
 		}
+		
 	}
 }
+
+void FPSActor::takeDamage(int dmg)
+{
+	HP -= dmg;
+	Game::instance().getHUD()->updateHP(HP);
+	if (HP <= 0) {
+		Game::instance().setState(GameState::Quit);
+	}
+}
+

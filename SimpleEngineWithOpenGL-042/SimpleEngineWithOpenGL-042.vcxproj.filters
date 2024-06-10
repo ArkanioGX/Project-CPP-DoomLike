@@ -178,6 +178,11 @@
     <ClCompile Include="TargetComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="DoorActor.cpp" />
+    <ClCompile Include="DoorPlaneActor.cpp" />
+    <ClCompile Include="BulletImpactActor.cpp" />
+    <ClCompile Include="PickableKeyActor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
@@ -368,6 +373,11 @@
     <ClInclude Include="TargetComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="DoorActor.h" />
+    <ClInclude Include="DoorPlaneActor.h" />
+    <ClInclude Include="BulletImpactActor.h" />
+    <ClInclude Include="PickableKeyActor.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Components">
@@ -412,6 +422,9 @@
     <Filter Include="Localization">
       <UniqueIdentifier>{dfac073a-bddc-4ee1-bf3f-cd834948e8c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Levels">
+      <UniqueIdentifier>{88dc520b-7711-4efb-93ef-144d3be171b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Res\Shaders\Sprite.frag">
@@ -455,6 +468,12 @@
     </None>
     <None Include="Res\Localization\Russian.gptext">
       <Filter>Localization</Filter>
+    </None>
+    <None Include="Res\Levels\level1.json">
+      <Filter>Levels</Filter>
+    </None>
+    <None Include="Res\Meshes\BulletImpact.gpmesh">
+      <Filter>Meshes</Filter>
     </None>
   </ItemGroup>
 </Project>

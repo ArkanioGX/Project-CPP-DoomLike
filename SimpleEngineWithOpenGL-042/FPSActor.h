@@ -16,6 +16,11 @@ public:
 	void setVisible(bool isVisible);
 	void fixCollisions();
 
+	void takeDamage(int dmg);
+
+	int getHP() { return HP; }
+	int getMaxHP() { return maxHP; }
+
 private:
 	class MoveComponent* moveComponent;
 	class AudioComponent* audioComponent;
@@ -25,6 +30,12 @@ private:
 	SoundEvent footstep;
 	float lastFootstep;
 	class BoxComponent* boxComponent;
+	float SwayPosition = 0;
+	float SwayMultiplier = 2;
+	float SwayUpRatio = 0.3;
+
+	int maxHP = 10;
+	int HP = maxHP;
 };
 
-const Vector3 MODEL_OFFSET = Vector3(10.0f, 10.0f, -10.0f);
+const Vector3 MODEL_OFFSET = Vector3(10.0f, 0.0f,-10.f);

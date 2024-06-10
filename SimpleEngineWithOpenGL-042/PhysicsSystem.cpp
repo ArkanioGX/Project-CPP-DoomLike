@@ -3,6 +3,8 @@
 #include "BoxComponent.h"
 #include <algorithm>
 
+std::vector<Actor*> PhysicsSystem::DEFAULT_IGNORE = std::vector<Actor*>();
+
 PhysicsSystem::PhysicsSystem()
 {
 }
@@ -23,7 +25,7 @@ void PhysicsSystem::removeBox(BoxComponent* box)
 	}
 }
 
-bool PhysicsSystem::segmentCast(const LineSegment& l, CollisionInfo& outColl)
+bool PhysicsSystem::segmentCast(const LineSegment& l, CollisionInfo& outColl, std::vector<Actor*>& ActorsToIgnore)
 {
 	bool collided = false;
 	// Initialize closestT to infinity, so first
@@ -35,11 +37,12 @@ bool PhysicsSystem::segmentCast(const LineSegment& l, CollisionInfo& outColl)
 	{
 		float t;
 		// Does the segment intersect with the box?
-		if (Collisions::intersect(l, box->getWorldBox(), t, norm))
+		if (Collisions::intersect(l, box->getWorldBox(), t, norm) )
 		{
 			// Is this closer than previous intersection?
-			if (t < closestT)
+			if (t < closestT && std::find(ActorsToIgnore.begin(),ActorsToIgnore.end(),&box->getOwner()) == ActorsToIgnore.end())
 			{
+				closestT = t;
 				outColl.point = l.pointOnSegment(t);
 				outColl.normal = norm;
 				outColl.box = box;

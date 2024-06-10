@@ -13,16 +13,22 @@ public:
 	void addTargetComponent(class TargetComponent* tc);
 	void removeTargetComponent(class TargetComponent* tc);
 
+	void updateHP(int hp);
 
 protected:
 	void updateCrosshair(float deltaTime);
 	void updateRadar(float deltaTime);
+	
 
 	class Texture* crosshair;
 	class Texture* crosshairEnemy;
 	class Texture* radar;
 	class Texture* blipTex;
 	class Texture* radarArrow;
+	class Texture* HPLogo;
+	class Texture* HPBG;
+	class Texture* HPCount;
+	class Font& font;
 
 	std::vector<class TargetComponent*> targetComponents;
 	bool isTargetingEnemy;

@@ -75,8 +75,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\SDL\SDL2-2.0.12\include;..\..\SDL\SDL2_image-2.0.5\include;..\..\SDL\SDL2_mixer-2.0.4\include;..\..\SDL\SDL2_ttf-2.0.15\include;..\..\SDL\glew-2.1.0\include;..\..\SDL\rapidjson\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\SDL\SDL2-2.0.12\lib\x64;..\..\SDL\SDL2_image-2.0.5\lib\x64;..\..\SDL\SDL2_mixer-2.0.4\lib\x64;..\..\SDL\SDL2_ttf-2.0.15\lib\x64;..\..\SDL\glew-2.1.0\lib\Release\x64;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\SDL\SDL2-2.0.12\include;$(ProjectDir)..\SDL\SDL2_image-2.0.5\include;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\include;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\include;$(ProjectDir)..\SDL\glew-2.1.0\include;$(ProjectDir)..\SDL\rapidjson\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\SDL\SDL2-2.0.12\lib\x64;$(ProjectDir)..\SDL\SDL2_image-2.0.5\lib\x64;$(ProjectDir)..\SDL\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\SDL\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)..\SDL\glew-2.1.0\lib\Release\x64;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -154,10 +154,13 @@
     <ClCompile Include="BallActor.cpp" />
     <ClCompile Include="BallMoveComponent.cpp" />
     <ClCompile Include="BoxComponent.cpp" />
+    <ClCompile Include="BulletImpactActor.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="Collisions.cpp" />
     <ClCompile Include="DialogBox.cpp" />
+    <ClCompile Include="DoorActor.cpp" />
+    <ClCompile Include="DoorPlaneActor.cpp" />
     <ClCompile Include="FollowActor.cpp" />
     <ClCompile Include="FollowCameraComponent.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="InputComponent.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="KeyboardState.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="LineSegment.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -184,6 +188,7 @@
     <ClCompile Include="OrbitCameraComponent.cpp" />
     <ClCompile Include="PauseScreen.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="PickableKeyActor.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="PlaneActor.cpp" />
     <ClCompile Include="Quaternion.cpp" />
@@ -219,11 +224,14 @@
     <ClInclude Include="BallActor.h" />
     <ClInclude Include="BallMoveComponent.h" />
     <ClInclude Include="BoxComponent.h" />
+    <ClInclude Include="BulletImpactActor.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="Collisions.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="DialogBox.h" />
+    <ClInclude Include="DoorActor.h" />
+    <ClInclude Include="DoorPlaneActor.h" />
     <ClInclude Include="FollowActor.h" />
     <ClInclude Include="FollowCameraComponent.h" />
     <ClInclude Include="Font.h" />
@@ -240,6 +248,7 @@
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="IRenderer.h" />
     <ClInclude Include="KeyboardState.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="LineSegment.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Maths.h" />
@@ -252,6 +261,7 @@
     <ClInclude Include="OrbitCameraComponent.h" />
     <ClInclude Include="PauseScreen.h" />
     <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="PickableKeyActor.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PlaneActor.h" />
     <ClInclude Include="Quaternion.h" />
@@ -278,8 +288,10 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Res\Levels\level1.json" />
     <None Include="Res\Localization\English.gptext" />
     <None Include="Res\Localization\Russian.gptext" />
+    <None Include="Res\Meshes\BulletImpact.gpmesh" />
     <None Include="Res\Meshes\Cube.gpmesh" />
     <None Include="Res\Meshes\Plane.gpmesh" />
     <None Include="Res\Meshes\RacingCar.gpmesh" />
